@@ -1,21 +1,33 @@
-open System.Runtime.InteropServices
-
 open System
+
+[<Literal>]
+let ExitIntent = "exit" //Literal used for patter matching must be capitalized (ie not exitIntent)
 
 let getInput () =
     printf "guess:>"
-    let input = Console.ReadLine ()
-    input
+    Console.ReadLine ()
 
 let output (s:string) =
     printfn "You typed: %s" s
 
-let rec gameLoop() =
+let detectExit s =
+    match s with
+    | ExitIntent -> -1
+    | _ -> 0
+
+
+let rec gameLoop () =
+    let decideAction s =
+        match (detectExit s) with
+        | 0 -> gameLoop
+        | _ -> (fun x -> Console.WriteLine "Exiting the game. Thanks for playing!") //return anonymous function
+
     let input = getInput ()
     output input
-    gameLoop() 
+    let action = decideAction input
+    action () //these two steps could be one line, but made into 2 to show that a function is returned from 'decideAction'
 
 [<EntryPoint>]
 let main argv =
-    gameLoop()
+    gameLoop ()
     0 // return an integer exit code
